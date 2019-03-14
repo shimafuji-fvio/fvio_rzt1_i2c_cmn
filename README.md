@@ -36,14 +36,14 @@ fvio_rzt1_i2c_cmnはルネサス エレクトロニクス（以下ルネサス�
 
 ## 2.2 対応デバイス
 fvio_rzt1_i2c_cmnの現在対応しているデバイスは以下になります。
-- [Grove - OLED Display 0.96 inch(SSD1306)](http://wiki.seeedstudio.com/Grove-OLED_Display_0.96inch/)
+- [Grove - OLED Display 0.96 inch(SSD1306/SSD1308Z)](http://wiki.seeedstudio.com/Grove-OLED_Display_0.96inch/)
 - [Grove - 3 Axis Digital Accelerometer(±16g) (ADXL345)](http://wiki.seeedstudio.com/Grove-3-Axis_Digital_Accelerometer-16g/)
 
 # [3.ビルド手順](#目次)
 
 ## 3.1 ビルド環境
 ビルドには以下のツールが必要です。
-- [KPIT GNUARM-NONE v14.02](https://gcc-renesas.com/ja/)
+- [KPIT GNUARM-NONE v16.01](https://gcc-renesas.com/ja/rz/rz-download-toolchains/)
 - [e2studio ver.7.1.0](https://www.renesas.com/jp/ja/products/software-tools/tools/ide/e2studio.html)
 
 ## 3.2 ベースプログラム
@@ -58,13 +58,16 @@ fvio_rzt1_i2c_cmnは以下のルネサス製のRZ/T1サンプルプログラム�
 ## 3.3 ファイル追加
 リポジトリから取得したファイルをルネサス製のサンプルプログラム(an-r01an2554jj0141-rzt1-initial-settings)に対して以下のように追加して下さい。(★:追加ファイル・ディレクトリ)
 
+★:fvio_rzt1_i2c_cmnから追加<br>
+◎:an-r01an3569jj0200-rzt1-encoderから追加<br>
+
 RZ_T_sflash_sample/(※1)<br>
 　　　　┣inc/<br>
-　　　　┃  ┗★r_ecl_rzt1_if.h(※2)<br>
+　　　　┃  ┗◎r_ecl_rzt1_if.h<br>
 　　　　┃<br>
 　　　　┣★lib/<br>
 　　　　┃  ┗ ★ecl/<br>
-　　　　┃  　┣ ★r_ecl_rzt1.a(※2)<br>
+　　　　┃  　┣ ◎r_ecl_rzt1.a<br>
 　　　　┃  　┣ ★s_fvIO_rzt1_comn_i2c_0.dat<br>
 　　　　┃  　┣ ★s_fvIO_rzt1_comn_i2c_1.dat<br>
 　　　　┃  　┣ ★s_fvIO_rzt1_comn_i2c_2.dat<br>
@@ -75,13 +78,13 @@ RZ_T_sflash_sample/(※1)<br>
 　　　　┃  　┗ ★s_fvIO_rzt1_comn_i2c_7.dat<br>
 　　　　┗src/<br>
 　　　　　 ┣★fvio/<br>
-　　　　　 ┃   ┣ ★dev_driver/(※3)<br>
+　　　　　 ┃   ┣ ★dev_driver/(※2)<br>
 　　　　　 ┃   ┃          ┣ ★adxl345/<br>
 　　　　　 ┃   ┃          ┃　　　　┣★fvIO_rzt1_i2c_adxl345.c<br>
 　　　　　 ┃   ┃          ┃　　　　┗★fvIO_rzt1_i2c_adxl345.h<br>
 　　　　　 ┃   ┃	      ┗ ★ssd1306/<br>
-　　　　　 ┃   ┃       　　　　　  ┣★fvIO_rzt1_i2c_adxl345.c<br>
-　　　　　 ┃   ┃       　　　　　  ┗★fvIO_rzt1_i2c_adxl345.h<br>
+　　　　　 ┃   ┃          　　　　　┣★fvIO_rzt1_i2c_ssd1306.c<br>
+　　　　　 ┃   ┃          　　　　　┗★fvIO_rzt1_i2c_ssd1306.h<br>
 　　　　　 ┃   ┣ ★fvio_driver/<br>
 　　　　　 ┃   ┃          ┣ ★fvIO_cmn_if.h<br>
 　　　　　 ┃   ┃          ┣ ★fvIO_rzt1_dma.c<br>
@@ -95,12 +98,11 @@ RZ_T_sflash_sample/(※1)<br>
 　　　　　 ┃               ┗ ★fvIO_if.h<br>
 　　　　　 ┃<br>
 　　　　　 ┗sample/<br>
-　　　　　  　 ┗ ★main.c(※4)<br>
+　　　　　  　 ┗ ★main.c(※3)<br>
 
 ※1 RZ_T_ram_sampleでも同様の追加を行います。<br>
-※2 an-r01an3569jj0200-rzt1-encoder.zipのライブラリファイル。<br>
-※3 リポジトリのdev_driver内の必要なディレクトリを追加します。<br>
-※4 リポジトリのサンプルプログラムを使用するかは任意です。<br>
+※2 リポジトリのdev_driver内の必要なディレクトリを追加します。<br>
+※3 リポジトリのサンプルプログラムを使用するかは任意です。<br>
 
 ## 3.4 ファイル修正
 SEMB1401を使用する場合、src/common/sflash_boot/spibsc_ioset_userdef.cに以下の修正が必要です。
@@ -118,7 +120,7 @@ SEMB1401を使用する場合、src/common/sflash_boot/spibsc_ioset_userdef.cに
 ```
 
 ## 3.5 ビルド
-プロジェクトのプロパティの以下のように修正してからビルドを実行します。
+プロジェクトのプロパティで以下のように修正してからビルドを実行します。
 
 （１）Target Processor<br>
 ![](images/set_target.jpg "set_target")<br>
