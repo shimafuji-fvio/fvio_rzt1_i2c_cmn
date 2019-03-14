@@ -56,7 +56,7 @@ fvio_rzt1_i2c_cmnは以下のルネサス製のRZ/T1サンプルプログラム�
 | an-r01an3569jj0200-rzt1-encoder.zip | RZ/T1 Encoder I/F（ライブラリ) |
 
 ## 3.3 ファイル追加
-リポジトリから取得したファイルをルネサス製のサンプルプログラム(an-r01an2554jj0141-rzt1-initial-settings)に対して以下のように追加して下さい。(★:追加ファイル・ディレクトリ)
+リポジトリから取得したファイルをルネサス製のサンプルプログラム(an-r01an2554jj0141-rzt1-initial-settings)に対して以下のように追加して下さい。
 
 ★:fvio_rzt1_i2c_cmnから追加<br>
 ◎:an-r01an3569jj0200-rzt1-encoderから追加<br>
