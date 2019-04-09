@@ -320,12 +320,12 @@ void fvio_i2c_cmn_wait( int32_t slot_id )
  ***************************************************************************/
 int32_t fvio_i2c_cmn_getreg( int32_t slot_id, uint8_t *rdata, uint8_t sz)
 {
-    uint8_t i;
+    int32_t i;
     uint8_t *output;
 
     output = &fvio_if[slot_id].reg->OREG0;
 
-    for( i = sz ; i > 0 ; i-- ){
+    for( i = sz ; i >= 0 ; i-- ){
         rdata[sz-i] = *(output + i);
     }
 
@@ -343,7 +343,7 @@ int32_t fvio_i2c_cmn_getreg( int32_t slot_id, uint8_t *rdata, uint8_t sz)
  ***************************************************************************/
 int32_t fvio_i2c_cmn_getfifo( int32_t slot_id, uint8_t *rdata, uint8_t sz)
 {
-    uint8_t i;
+    int32_t i;
 
     for( i = 0 ; i <= sz ; i++ ){
         rdata[i] = (*fvio_if[slot_id].fifo);
