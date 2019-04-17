@@ -16,22 +16,22 @@
 #include "fvIO_rzt1_i2c_cmn.h"
 #include "fvIO_rzt1_i2c_ssd1306.h"
 
-static void    ssd1306_init( int32_t slot_id );
-static int32_t ssd1306_get_inf( ST_FVIO_IF_INFO *attr );
-static int32_t ssd1306_trg_stop( int32_t slot_id );
-static int32_t ssd1306_wr_ctrl_reg( int32_t slot_id, ST_FVIO_SSD1306_CREG *attr );
-static int32_t ssd1306_wr_dma( int32_t slot_id, ST_FVIO_SSD1306_DMA *attr );
-static int32_t ssd1306_set_cnf( int32_t slot_id, ST_FVIO_SSD1306_CNF *attr );
-static int32_t ssd1306_get_cnf( int32_t slot_id, ST_FVIO_SSD1306_CNF *attr );
-static int32_t ssd1306_set_int( int32_t slot_id, ST_FVIO_SSD1306_INT *attr );
-static int32_t ssd1306_get_bsy( int32_t slot_id );
-static int32_t ssd1306_dma_restart( int32_t slot_id );
-static void    ssd1306_isr_pae_func( int32_t slot_id );
-static void    ssd1306_isr_paf_func( int32_t slot_id );
+static void    fvio_i2c_ssd1306_init( int32_t slot_id );
+static int32_t fvio_i2c_ssd1306_get_inf( ST_FVIO_IF_INFO *attr );
+static int32_t fvio_i2c_ssd1306_trg_stop( int32_t slot_id );
+static int32_t fvio_i2c_ssd1306_wr_ctrl_reg( int32_t slot_id, ST_FVIO_I2C_SSD1306_CREG *attr );
+static int32_t fvio_i2c_ssd1306_wr_dma( int32_t slot_id, ST_FVIO_I2C_SSD1306_DMA *attr );
+static int32_t fvio_i2c_ssd1306_set_cnf( int32_t slot_id, ST_FVIO_I2C_SSD1306_CNF *attr );
+static int32_t fvio_i2c_ssd1306_get_cnf( int32_t slot_id, ST_FVIO_I2C_SSD1306_CNF *attr );
+static int32_t fvio_i2c_ssd1306_set_int( int32_t slot_id, ST_FVIO_I2C_SSD1306_INT *attr );
+static int32_t fvio_i2c_ssd1306_get_bsy( int32_t slot_id );
+static int32_t fvio_i2c_ssd1306_dma_restart( int32_t slot_id );
+static void    fvio_i2c_ssd1306_isr_pae_func( int32_t slot_id );
+static void    fvio_i2c_ssd1306_isr_paf_func( int32_t slot_id );
 
 typedef struct {
-    ST_FVIO_SSD1306_CNF        TblfvIOCnf[FVIO_SLOT_NUM];        //config設定
-    ST_FVIO_SSD1306_INT        TblfvIOInt[FVIO_SLOT_NUM];        //interrupt
+    ST_FVIO_I2C_SSD1306_CNF    TblfvIOCnf[FVIO_SLOT_NUM];        //config設定
+    ST_FVIO_I2C_SSD1306_INT    TblfvIOInt[FVIO_SLOT_NUM];        //interrupt
     uint8_t                    TblPlugBusy[FVIO_SLOT_NUM];       //busyフラグ(DMA実行中)
 }ST_FVIO_SSD1306_INFO;
 
@@ -40,12 +40,12 @@ ST_FVIO_SSD1306_INFO ssd1306_inf;
 ST_FVIO_IF_LIST fvio_i2c_ssd1306_entry = {
         0x00100201,
         1,
-        fvio_ssd1306_assign,
-        fvio_ssd1306_unassign,
-        fvio_ssd1306_start,
-        fvio_ssd1306_stop,
-        fvio_ssd1306_write,
-        fvio_ssd1306_read,
+        fvio_i2c_ssd1306_assign,
+        fvio_i2c_ssd1306_unassign,
+        fvio_i2c_ssd1306_start,
+        fvio_i2c_ssd1306_stop,
+        fvio_i2c_ssd1306_write,
+        fvio_i2c_ssd1306_read,
         NULL,
 };
 
@@ -59,7 +59,7 @@ ST_FVIO_IF_LIST fvio_i2c_ssd1306_entry = {
  * [返値]    :int32_t                0=正常、0以外=異常
  * [備考]    :
  ***************************************************************************/
-int32_t fvio_ssd1306_assign( int32_t slot_id, void **config, void *attr )
+int32_t fvio_i2c_ssd1306_assign( int32_t slot_id, void **config, void *attr )
 {
     int32_t ret, i, cre_id = 0;
 
@@ -79,7 +79,7 @@ int32_t fvio_ssd1306_assign( int32_t slot_id, void **config, void *attr )
  * [返値]    :int32_t                0=正常、0以外=異常
  * [備考]    :
  ***************************************************************************/
-int32_t fvio_ssd1306_unassign( int32_t slot_id )
+int32_t fvio_i2c_ssd1306_unassign( int32_t slot_id )
 {
     fvio_i2c_cmn_init_port_hiz(slot_id);
     return 0;
@@ -93,7 +93,7 @@ int32_t fvio_ssd1306_unassign( int32_t slot_id )
  * [返値]    :int32_t                0=正常、0以外=異常
  * [備考]    :
  ***************************************************************************/
-int32_t fvio_ssd1306_start( int32_t slot_id, void *attr )
+int32_t fvio_i2c_ssd1306_start( int32_t slot_id, void *attr )
 {
     int32_t ret;
 
@@ -107,7 +107,7 @@ int32_t fvio_ssd1306_start( int32_t slot_id, void *attr )
     }
 
     //内部処理初期化
-    ssd1306_init( slot_id );
+    fvio_i2c_ssd1306_init( slot_id );
 
     return 0;
 }
@@ -120,9 +120,9 @@ int32_t fvio_ssd1306_start( int32_t slot_id, void *attr )
  * [返値]    :int32_t                0=正常、0以外=異常
  * [備考]    :
  ***************************************************************************/
-int32_t fvio_ssd1306_stop( int32_t slot_id, void *attr )
+int32_t fvio_i2c_ssd1306_stop( int32_t slot_id, void *attr )
 {
-    ssd1306_trg_stop( slot_id );
+	fvio_i2c_ssd1306_trg_stop( slot_id );
 
     fvio_i2c_cmn_init_int(slot_id, 0);
     fvio_i2c_cmn_isr_paf[slot_id] = NULL ;    //割り込みは使用しない
@@ -140,26 +140,26 @@ int32_t fvio_ssd1306_stop( int32_t slot_id, void *attr )
  * [返値]    :int32_t                0=正常、0以外=異常
  * [備考]    :
  ***************************************************************************/
-int32_t fvio_ssd1306_write( int32_t slot_id, uint32_t mode, void *attr )
+int32_t fvio_i2c_ssd1306_write( int32_t slot_id, uint32_t mode, void *attr )
 {
     //stop
-    if( mode == FVIO_SSD1306_MODE_STOP ){
-        return ssd1306_trg_stop( slot_id );
+    if( mode == FVIO_I2C_SSD1306_MODE_STOP ){
+        return fvio_i2c_ssd1306_trg_stop( slot_id );
     //ctrl reg
-    }else if( mode == FVIO_SSD1306_MODE_CREG ){
-        return ssd1306_wr_ctrl_reg( slot_id, attr );
+    }else if( mode == FVIO_I2C_SSD1306_MODE_CREG ){
+        return fvio_i2c_ssd1306_wr_ctrl_reg( slot_id, attr );
     //dma
-    }else if( mode == FVIO_SSD1306_MODE_DMA ){
-        return ssd1306_wr_dma( slot_id, attr );
+    }else if( mode == FVIO_I2C_SSD1306_MODE_DMA ){
+        return fvio_i2c_ssd1306_wr_dma( slot_id, attr );
     //cnf
-    }else if( mode == FVIO_SSD1306_MODE_CNF ){
-        return ssd1306_set_cnf( slot_id, attr );
+    }else if( mode == FVIO_I2C_SSD1306_MODE_CNF ){
+        return fvio_i2c_ssd1306_set_cnf( slot_id, attr );
     //int
-    }else if( mode == FVIO_SSD1306_MODE_INT ){
-        return ssd1306_set_int( slot_id, attr );
+    }else if( mode == FVIO_I2C_SSD1306_MODE_INT ){
+        return fvio_i2c_ssd1306_set_int( slot_id, attr );
     //dma restart
-    }else if( mode == FVIO_SSD1306_MODE_RDMA ){
-        return ssd1306_dma_restart( slot_id );
+    }else if( mode == FVIO_I2C_SSD1306_MODE_RDMA ){
+        return fvio_i2c_ssd1306_dma_restart( slot_id );
     }else{
         return -1;
     }
@@ -176,17 +176,17 @@ int32_t fvio_ssd1306_write( int32_t slot_id, uint32_t mode, void *attr )
  * [返値]    :int32_t                0=正常、0以外=異常
  * [備考]    :
  ***************************************************************************/
-int32_t fvio_ssd1306_read( int32_t slot_id, uint32_t mode, void *attr )
+int32_t fvio_i2c_ssd1306_read( int32_t slot_id, uint32_t mode, void *attr )
 {
     //inf
-    if( mode == FVIO_SSD1306_MODE_INFO ){
-        return ssd1306_get_inf( attr );
+    if( mode == FVIO_I2C_SSD1306_MODE_INFO ){
+        return fvio_i2c_ssd1306_get_inf( attr );
     //cnf
-    }else if( mode == FVIO_SSD1306_MODE_CNF ){
-        return ssd1306_get_cnf( slot_id, attr );
+    }else if( mode == FVIO_I2C_SSD1306_MODE_CNF ){
+        return fvio_i2c_ssd1306_get_cnf( slot_id, attr );
     //busy
-    }else if( mode == FVIO_SSD1306_MODE_BSY ){
-        return ssd1306_get_bsy( slot_id );
+    }else if( mode == FVIO_I2C_SSD1306_MODE_BSY ){
+        return fvio_i2c_ssd1306_get_bsy( slot_id );
     }else{
         return -1;
     }
@@ -201,7 +201,7 @@ int32_t fvio_ssd1306_read( int32_t slot_id, uint32_t mode, void *attr )
  * [返値]    :なし
  * [備考]    :
  ***************************************************************************/
-static void ssd1306_init( int32_t slot_id )
+static void fvio_i2c_ssd1306_init( int32_t slot_id )
 {
     int32_t i;
 
@@ -211,8 +211,8 @@ static void ssd1306_init( int32_t slot_id )
     ssd1306_inf.TblPlugBusy[slot_id]      = FVIO_I2C_DMA_STOP;
 
     //割り込み初期化
-    fvio_i2c_cmn_isr_paf[slot_id] = ssd1306_isr_paf_func;
-    fvio_i2c_cmn_isr_pae[slot_id] = ssd1306_isr_pae_func;
+    fvio_i2c_cmn_isr_paf[slot_id] = fvio_i2c_ssd1306_isr_paf_func;
+    fvio_i2c_cmn_isr_pae[slot_id] = fvio_i2c_ssd1306_isr_pae_func;
 
     fvio_i2c_cmn_init_int(slot_id, 1);
 }
@@ -224,11 +224,11 @@ static void ssd1306_init( int32_t slot_id )
  * [返値]    :int32_t                0=正常、0以外=異常
  * [備考]    :
  ***************************************************************************/
-static int32_t ssd1306_get_inf( ST_FVIO_IF_INFO *attr )
+static int32_t fvio_i2c_ssd1306_get_inf( ST_FVIO_IF_INFO *attr )
 {
-    attr->io_type = FVIO_SSD1306_INFO_TYPE;
-    attr->in_sz   = FVIO_SSD1306_INFO_INSZ;
-    attr->out_sz  = FVIO_SSD1306_INFO_OUTSZ;
+    attr->io_type = FVIO_I2C_SSD1306_INFO_TYPE;
+    attr->in_sz   = FVIO_I2C_SSD1306_INFO_INSZ;
+    attr->out_sz  = FVIO_I2C_SSD1306_INFO_OUTSZ;
     return 0;
 }
 
@@ -239,7 +239,7 @@ static int32_t ssd1306_get_inf( ST_FVIO_IF_INFO *attr )
  * [返値]    :int32_t                0=正常、0以外=異常
  * [備考]    :
  ***************************************************************************/
-static int32_t ssd1306_trg_stop( int32_t slot_id )
+static int32_t fvio_i2c_ssd1306_trg_stop( int32_t slot_id )
 {
     uint32_t ofst = 0x10 * slot_id ;
     uint8_t  dummy[16];
@@ -268,7 +268,7 @@ static int32_t ssd1306_trg_stop( int32_t slot_id )
  * [返値]    :int32_t                                0=正常、0以外=異常
  * [備考]    :
  ***************************************************************************/
-static int32_t ssd1306_wr_ctrl_reg( int32_t slot_id, ST_FVIO_SSD1306_CREG *attr )
+static int32_t fvio_i2c_ssd1306_wr_ctrl_reg( int32_t slot_id, ST_FVIO_I2C_SSD1306_CREG *attr )
 {
     ST_FVIO_I2C_CMN_CMD para;
 
@@ -302,7 +302,7 @@ static int32_t ssd1306_wr_ctrl_reg( int32_t slot_id, ST_FVIO_SSD1306_CREG *attr 
  * [返値]    :int32_t                     0=正常、0以外=異常
  * [備考]    :
  ***************************************************************************/
-static int32_t ssd1306_wr_dma( int32_t slot_id, ST_FVIO_SSD1306_DMA *attr )
+static int32_t fvio_i2c_ssd1306_wr_dma( int32_t slot_id, ST_FVIO_I2C_SSD1306_DMA *attr )
 {
     ST_FVIO_I2C_CMN_CMD para;
 
@@ -341,7 +341,7 @@ static int32_t ssd1306_wr_dma( int32_t slot_id, ST_FVIO_SSD1306_DMA *attr )
  * [返値]    :int32_t                     0=正常、0以外=異常
  * [備考]    :
  ***************************************************************************/
-static int32_t ssd1306_set_cnf( int32_t slot_id, ST_FVIO_SSD1306_CNF *attr )
+static int32_t fvio_i2c_ssd1306_set_cnf( int32_t slot_id, ST_FVIO_I2C_SSD1306_CNF *attr )
 {
     ssd1306_inf.TblfvIOCnf[slot_id].cwait  = attr->cwait;
     ssd1306_inf.TblfvIOCnf[slot_id].lwait  = attr->lwait;
@@ -356,7 +356,7 @@ static int32_t ssd1306_set_cnf( int32_t slot_id, ST_FVIO_SSD1306_CNF *attr )
  * [返値]    :int32_t                     0=正常、0以外=異常
  * [備考]    :
  ***************************************************************************/
-static int32_t ssd1306_get_cnf( int32_t slot_id, ST_FVIO_SSD1306_CNF *attr )
+static int32_t fvio_i2c_ssd1306_get_cnf( int32_t slot_id, ST_FVIO_I2C_SSD1306_CNF *attr )
 {
     attr->cwait = ssd1306_inf.TblfvIOCnf[slot_id].cwait;
     attr->lwait = ssd1306_inf.TblfvIOCnf[slot_id].lwait;
@@ -371,7 +371,7 @@ static int32_t ssd1306_get_cnf( int32_t slot_id, ST_FVIO_SSD1306_CNF *attr )
  * [返値]    :int32_t                     0=正常、0以外=異常
  * [備考]    :
  ***************************************************************************/
-static int32_t ssd1306_set_int( int32_t slot_id, ST_FVIO_SSD1306_INT *attr )
+static int32_t fvio_i2c_ssd1306_set_int( int32_t slot_id, ST_FVIO_I2C_SSD1306_INT *attr )
 {
     ssd1306_inf.TblfvIOInt[slot_id].paf_callback = attr->paf_callback;
     ssd1306_inf.TblfvIOInt[slot_id].pae_callback = attr->pae_callback;
@@ -385,7 +385,7 @@ static int32_t ssd1306_set_int( int32_t slot_id, ST_FVIO_SSD1306_INT *attr )
  * [返値]    :int32_t                    FVIO_LOOP=連続実行中、FVIO_BUSY=単発実行中、FVIO_STOP=停止
  * [備考]    :
  ***************************************************************************/
-static int32_t ssd1306_get_bsy( int32_t slot_id )
+static int32_t fvio_i2c_ssd1306_get_bsy( int32_t slot_id )
 {
     return ssd1306_inf.TblPlugBusy[slot_id];
 }
@@ -397,7 +397,7 @@ static int32_t ssd1306_get_bsy( int32_t slot_id )
  * [返値]    :
  * [備考]    :リピート or syncでトリガ実行した場合にDMAに対し、再トリガをかける
  ***************************************************************************/
-static int32_t ssd1306_dma_restart( int32_t slot_id )
+static int32_t fvio_i2c_ssd1306_dma_restart( int32_t slot_id )
 {
     uint32_t ofst = 0x10 * slot_id;
 
@@ -419,7 +419,7 @@ static int32_t ssd1306_dma_restart( int32_t slot_id )
  * [返値]    :なし
  * [備考]    :fvIO_rzt1_i2c_cmn.cの各割り込み処理(fvio_i2c_cmn_isr_paen)からコールされる
  ***************************************************************************/
-static void ssd1306_isr_pae_func( int32_t slot_id )
+static void fvio_i2c_ssd1306_isr_pae_func( int32_t slot_id )
 {
     uint32_t ofst = 0x10 * slot_id;
 
@@ -441,7 +441,7 @@ static void ssd1306_isr_pae_func( int32_t slot_id )
  * [返値]    :なし
  * [備考]    :fvIO_rzt1_i2c_cmn.cの各割り込み処理(fvio_i2c_cmn_isr_pafn)からコールされる
  ***************************************************************************/
-static void ssd1306_isr_paf_func( int32_t slot_id )
+static void fvio_i2c_ssd1306_isr_paf_func( int32_t slot_id )
 {
     uint32_t ofst = 0x10 * slot_id;
 

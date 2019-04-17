@@ -205,7 +205,7 @@ int32_t fvio_i2c_cmn_cmd( int32_t slot_id, uint8_t cmd, ST_FVIO_I2C_CMN_CMD *att
     uint8_t *input, inc;
 
     //コマンド番号チェック
-    if( cmd >= FVIO_I2C_CMN_CMD_NUM ){
+    if( cmd >= FVIO_I2C_CMN_CMD_NUM || cmd == 0 ){
         return -1;
     //スロットIDチェック
     }else if( slot_id >= FVIO_SLOT_NUM ){
@@ -214,7 +214,7 @@ int32_t fvio_i2c_cmn_cmd( int32_t slot_id, uint8_t cmd, ST_FVIO_I2C_CMN_CMD *att
     }else if( attr->slen > 7 ){
         return -1;
     //送信データ数チェック(リード)
-    }else if( ( attr->slen > 6 ) && ( cmd <= FVIO_I2C_CMN_CMD_R3 ) ){
+    }else if( ( attr->slen > 6 ) && ( cmd <= FVIO_I2C_CMN_CMD_R2 ) ){
         return -1;
     //受信データ数チェック
     }else if( attr->rlen > 7 ){
@@ -229,9 +229,9 @@ int32_t fvio_i2c_cmn_cmd( int32_t slot_id, uint8_t cmd, ST_FVIO_I2C_CMN_CMD *att
     fvio_if[slot_id].reg->RLEN   = attr->rlen;                   //受信サイズ
 
     //通常動作, DMA動作(コマンドR2)
-    if( attr->dma_num == 0 || ( (attr->dma_num > 0) && ( cmd == FVIO_I2C_CMN_CMD_R2) ) ){
+    if( attr->dma_num == 0 || ( (attr->dma_num > 0) && ( cmd == FVIO_I2C_CMN_CMD_R1) ) ){
         //fifo入力
-        if( ( cmd == FVIO_I2C_CMN_CMD_R3 ) || ( cmd == FVIO_I2C_CMN_CMD_W2 ) ){
+        if( ( cmd == FVIO_I2C_CMN_CMD_R2 ) || ( cmd == FVIO_I2C_CMN_CMD_W2 ) ){
             input = fvio_if[slot_id].fifo;
             inc   = 0;
         //レジスタ入力
@@ -251,15 +251,15 @@ int32_t fvio_i2c_cmn_cmd( int32_t slot_id, uint8_t cmd, ST_FVIO_I2C_CMN_CMD *att
         }
 
         //slave addr(read)入力
-        if( ( cmd == FVIO_I2C_CMN_CMD_R1 ) || ( cmd == FVIO_I2C_CMN_CMD_R2 ) || ( cmd == FVIO_I2C_CMN_CMD_R3 ) ){
+        if( ( cmd == FVIO_I2C_CMN_CMD_R1 ) || ( cmd == FVIO_I2C_CMN_CMD_R2 ) ){
             *input = (attr->sdata[0] | 1 ) ;
         }
 
         if( attr->dma_num > 0 ){
             dma_init_r( slot_id, fvio_if[slot_id].fifo, attr->data1, attr->data2, (attr->rlen+1)*attr->dma_num );
         }
-    //DMA動作(コマンドR3)
-    }else if( cmd == FVIO_I2C_CMN_CMD_R3 ){
+    //DMA動作(コマンドR2)
+    }else if( cmd == FVIO_I2C_CMN_CMD_R2 ){
         dma_init_s( slot_id, attr->data1, attr->data2, fvio_if[slot_id].fifo, (attr->slen+2)*attr->dma_num );
         dma_init_r( slot_id, fvio_if[slot_id].fifo, attr->data1, attr->data2, (attr->rlen+1)*attr->dma_num );
     //DMA動作(コマンドW2)
@@ -307,29 +307,6 @@ void fvio_i2c_cmn_wait( int32_t slot_id )
             i=0;
         }
     }
-}
-
-/***************************************************************************
- * [名称]    :fvio_i2c_cmn_getreg
- * [機能]    :fvIO データ取得(IREG)
- * [引数]    :int32_t slot_id            スロットID
- *            uint8_t *rdata             取得データ
- *            uint8_t sz                 取得サイズ
- * [返値]    :int32_t                    0=正常、0以外=異常
- * [備考]    :リピート,sync,dmaを使用する処理では使用しないこと
- ***************************************************************************/
-int32_t fvio_i2c_cmn_getreg( int32_t slot_id, uint8_t *rdata, uint8_t sz)
-{
-    int32_t i;
-    uint8_t *output;
-
-    output = &fvio_if[slot_id].reg->OREG0;
-
-    for( i = sz ; i >= 0 ; i-- ){
-        rdata[sz-i] = *(output + i);
-    }
-
-    return 0;
 }
 
 /***************************************************************************

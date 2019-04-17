@@ -10,9 +10,8 @@ fvIO汎用プラグイン処理ヘッダ                         作成者:シ�
 
 //fvIO CMD
 #define FVIO_I2C_CMN_CMD_NUM            (5)
-#define FVIO_I2C_CMN_CMD_R1             (0)
-#define FVIO_I2C_CMN_CMD_R2             (1)
-#define FVIO_I2C_CMN_CMD_R3             (2)
+#define FVIO_I2C_CMN_CMD_R1             (1)
+#define FVIO_I2C_CMN_CMD_R2             (2)
 #define FVIO_I2C_CMN_CMD_W1             (3)
 #define FVIO_I2C_CMN_CMD_W2             (4)
 
@@ -43,7 +42,6 @@ void    fvio_i2c_cmn_init_port( int32_t slot_id );
 int32_t fvio_i2c_cmn_cmd( int32_t slot_id, uint8_t cmd, ST_FVIO_I2C_CMN_CMD *attr );
 int32_t fvio_i2c_cmn_stop( int32_t slot_id );
 void    fvio_i2c_cmn_wait( int32_t slot_id );
-int32_t fvio_i2c_cmn_getreg( int32_t slot_id, uint8_t *rdata, uint8_t sz);
 int32_t fvio_i2c_cmn_getfifo( int32_t slot_id, uint8_t *rdata, uint8_t sz);
 void    fvio_i2c_cmn_init_int(int32_t slot_id, uint32_t mode);
 
