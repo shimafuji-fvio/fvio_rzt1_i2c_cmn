@@ -51,7 +51,7 @@ uint8_t oled_startup_cmd[][6] = {
 };
 
 ST_FVIO_I2C_SSD1306_PACKET oled_data[2][128*2] __attribute__ ((section(".uncached_section")));    //OLED出力値
-uint8_t acc_data[2][128*6] __attribute__ ((section(".uncached_section")));                    //acc取得値
+uint8_t acc_data[2][128*6] __attribute__ ((section(".uncached_section")));                        //acc取得値
 
 int32_t wend=0;
 int32_t rend=0;

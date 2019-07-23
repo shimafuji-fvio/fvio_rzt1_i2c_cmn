@@ -34,9 +34,9 @@ typedef struct {
     ST_FVIO_I2C_ADXL345_CNF        TblfvIOCnf[FVIO_SLOT_NUM];        //config設定
     ST_FVIO_I2C_ADXL345_INT        TblfvIOInt[FVIO_SLOT_NUM];        //interrupt
     uint8_t                    TblPlugBusy[FVIO_SLOT_NUM];           //busyフラグ(DMA実行中)
-}ST_FVIO_SSD1306_INFO;
+}ST_FVIO_I2C_SSD1306_INFO;
 
-ST_FVIO_SSD1306_INFO adxl345_inf;
+ST_FVIO_I2C_SSD1306_INFO fvio_i2c_adxl345_inf;
 
 ST_FVIO_IF_LIST fvio_i2c_adxl345_entry = {
         0x00100101,
@@ -51,7 +51,7 @@ ST_FVIO_IF_LIST fvio_i2c_adxl345_entry = {
 };
 
 /***************************************************************************
- * [名称]    :fvio_adxl345_assign
+ * [名称]    :fvio_i2c_adxl345_assign
  * [機能]    :adxl345アサイン処理
  * [引数]    :int32_t slot_id        スロットID
  *            uint32_t slot_sz       スロットサイズ
@@ -74,7 +74,7 @@ int32_t fvio_i2c_adxl345_assign( int32_t slot_id, void **config, void *attr )
 }
 
 /***************************************************************************
- * [名称]    :fvio_adxl345_unassign
+ * [名称]    :fvio_i2c_adxl345_unassign
  * [機能]    :adxl345アンアサイン処理
  * [引数]    :int32_t slot_id        スロットID
  * [返値]    :int32_t                0=正常、0以外=異常
@@ -87,7 +87,7 @@ int32_t fvio_i2c_adxl345_unassign( int32_t slot_id )
 }
 
 /***************************************************************************
- * [名称]    :fvio_adxl345_start
+ * [名称]    :fvio_i2c_adxl345_start
  * [機能]    :adxl345スタート処理
  * [引数]    :int32_t slot_id        スロットID
  *            void *attr             実装依存の引数
@@ -114,7 +114,7 @@ int32_t fvio_i2c_adxl345_start( int32_t slot_id, void *attr )
 }
 
 /***************************************************************************
- * [名称]    :fvio_adxl345_stop
+ * [名称]    :fvio_i2c_adxl345_stop
  * [機能]    :adxl345ストップ処理
  * [引数]    :int32_t slot_id        スロットID
  *            void *attr             実装依存の引数
@@ -130,7 +130,7 @@ int32_t fvio_i2c_adxl345_stop( int32_t slot_id, void *attr )
 }
 
 /***************************************************************************
- * [名称]    :fvio_adxl345_write
+ * [名称]    :fvio_i2c_adxl345_write
  * [機能]    :adxl345ライト処理
  * [引数]    :int32_t slot_id        スロットID
  *            uint32_t mode          writeモード
@@ -166,7 +166,7 @@ int32_t fvio_i2c_adxl345_write( int32_t slot_id, uint32_t mode, void *attr )
 }
 
 /***************************************************************************
- * [名称]    :fvio_adxl345_read
+ * [名称]    :fvio_i2c_adxl345_read
  * [機能]    :adxl345リード処理
  * [引数]    :int32_t slot_id        スロットID
  *            uint32_t mode          readモード
@@ -195,7 +195,7 @@ int32_t fvio_i2c_adxl345_read( int32_t slot_id, uint32_t mode, void *attr )
 }
 
 /***************************************************************************
- * [名称]    :adxl345_init
+ * [名称]    :fvio_i2c_adxl345_init
  * [機能]    :adxl345初期化処理
  * [引数]    :int32_t slot_id        スロットID
  * [返値]    :なし
@@ -204,9 +204,9 @@ int32_t fvio_i2c_adxl345_read( int32_t slot_id, uint32_t mode, void *attr )
 static void fvio_i2c_adxl345_init( int32_t slot_id )
 {
     //CONFIG設定初期化
-    adxl345_inf.TblfvIOCnf[slot_id].cwait = 60;
-    adxl345_inf.TblfvIOCnf[slot_id].lwait = 0;
-    adxl345_inf.TblPlugBusy[slot_id]      = FVIO_I2C_DMA_STOP;
+	fvio_i2c_adxl345_inf.TblfvIOCnf[slot_id].cwait = 60;
+	fvio_i2c_adxl345_inf.TblfvIOCnf[slot_id].lwait = 0;
+	fvio_i2c_adxl345_inf.TblPlugBusy[slot_id]      = FVIO_I2C_DMA_STOP;
 
     //割り込み初期化
     fvio_i2c_cmn_isr_paf[slot_id] = fvio_i2c_adxl345_isr_paf_func;
@@ -216,7 +216,7 @@ static void fvio_i2c_adxl345_init( int32_t slot_id )
 }
 
 /***************************************************************************
- * [名称]    :adxl345_get_inf
+ * [名称]    :fvio_i2c_adxl345_get_inf
  * [機能]    :adxl345プラグイン情報取得
  * [引数]    :ST_FVIO_IF_INFO *attr  fvioプラグイン情報
  * [返値]    :int32_t                0=正常、0以外=異常
@@ -231,7 +231,7 @@ static int32_t fvio_i2c_adxl345_get_inf( ST_FVIO_IF_INFO *attr )
 }
 
 /***************************************************************************
- * [名称]    :adxl345_trg_stop
+ * [名称]    :fvio_i2c_adxl345_trg_stop
  * [機能]    :adxl345 fvIOシーケンス停止
  * [引数]    :int32_t slot_id        スロットID
  * [返値]    :int32_t                0=正常、0以外=異常
@@ -245,7 +245,7 @@ static int32_t fvio_i2c_adxl345_trg_stop( int32_t slot_id )
     fvio_i2c_cmn_stop(slot_id);                                           //TRG→STOP
     fvio_i2c_cmn_wait(slot_id);                                           //wait(lwait=maxなら約1[s])
 
-    if(adxl345_inf.TblPlugBusy[slot_id] != FVIO_I2C_DMA_STOP ){
+    if(fvio_i2c_adxl345_inf.TblPlugBusy[slot_id] != FVIO_I2C_DMA_STOP ){
         (*(volatile uint32_t*)(&DMA0.DMAC0_CHCTRL_0.LONG + ofst)) = 2;    //DMA中断
         (*(volatile uint32_t*)(&DMA0.DMAC0_CHCTRL_8.LONG + ofst)) = 2;    //DMA中断
 
@@ -253,14 +253,14 @@ static int32_t fvio_i2c_adxl345_trg_stop( int32_t slot_id )
         while( (*(volatile uint32_t*)(&DMA0.DMAC0_CHSTAT_8.LONG + ofst)) & 0x4 );
 
         fvio_i2c_cmn_getfifo( slot_id, dummy, 16);                        //FIFO空読み
-        adxl345_inf.TblPlugBusy[slot_id] = FVIO_I2C_DMA_STOP;
+        fvio_i2c_adxl345_inf.TblPlugBusy[slot_id] = FVIO_I2C_DMA_STOP;
     }
 
     return 0;
 }
 
 /***************************************************************************
- * [名称]    :adxl345_wr_ctrl_reg
+ * [名称]    :fvio_i2c_adxl345_wr_ctrl_reg
  * [機能]    :adxl345 コントロールレジスタライト
  * [引数]    :int32_t slot_id            スロットID
  *            ST_FVIO_ADXL345_CREG *attr コントロールレジスタのr/w用構造体
@@ -272,7 +272,7 @@ static int32_t fvio_i2c_adxl345_wr_ctrl_reg( int32_t slot_id, ST_FVIO_I2C_ADXL34
     ST_FVIO_I2C_CMN_CMD para;
 
     //busyチェック
-    if( adxl345_inf.TblPlugBusy[slot_id] != FVIO_I2C_DMA_STOP ){
+    if( fvio_i2c_adxl345_inf.TblPlugBusy[slot_id] != FVIO_I2C_DMA_STOP ){
         return -1;
     }
 
@@ -281,8 +281,8 @@ static int32_t fvio_i2c_adxl345_wr_ctrl_reg( int32_t slot_id, ST_FVIO_I2C_ADXL34
     para.rlen      = 0;
     para.sdata     = attr->sdata;
     para.dma_num   = 0;
-    para.cwait     = adxl345_inf.TblfvIOCnf[slot_id].cwait;
-    para.lwait     = adxl345_inf.TblfvIOCnf[slot_id].lwait;
+    para.cwait     = fvio_i2c_adxl345_inf.TblfvIOCnf[slot_id].cwait;
+    para.lwait     = fvio_i2c_adxl345_inf.TblfvIOCnf[slot_id].lwait;
 
     if( fvio_i2c_cmn_cmd( slot_id, FVIO_I2C_CMN_CMD_W1, &para ) != 0 ){
         return -1;
@@ -294,7 +294,7 @@ static int32_t fvio_i2c_adxl345_wr_ctrl_reg( int32_t slot_id, ST_FVIO_I2C_ADXL34
 }
 
 /***************************************************************************
- * [名称]    :adxl345_rd_ctrl_reg
+ * [名称]    :fvio_i2c_adxl345_rd_ctrl_reg
  * [機能]    :adxl345 コントロールレジスタリード
  * [引数]    :int32_t slot_id            スロットID
  *            ST_FVIO_ADXL345_CREG *attr コントロールレジスタのr/w用構造体
@@ -306,7 +306,7 @@ static int32_t fvio_i2c_adxl345_rd_ctrl_reg( int32_t slot_id, ST_FVIO_I2C_ADXL34
     ST_FVIO_I2C_CMN_CMD para;
 
     //busyチェック
-    if( adxl345_inf.TblPlugBusy[slot_id] != FVIO_I2C_DMA_STOP ){
+    if( fvio_i2c_adxl345_inf.TblPlugBusy[slot_id] != FVIO_I2C_DMA_STOP ){
         return -1;
     }
 
@@ -315,8 +315,8 @@ static int32_t fvio_i2c_adxl345_rd_ctrl_reg( int32_t slot_id, ST_FVIO_I2C_ADXL34
     para.rlen      = attr->sz;
     para.sdata     = attr->sdata;
     para.dma_num   = 0;
-    para.cwait     = adxl345_inf.TblfvIOCnf[slot_id].cwait;
-    para.lwait     = adxl345_inf.TblfvIOCnf[slot_id].lwait;
+    para.cwait     = fvio_i2c_adxl345_inf.TblfvIOCnf[slot_id].cwait;
+    para.lwait     = fvio_i2c_adxl345_inf.TblfvIOCnf[slot_id].lwait;
 
     if( fvio_i2c_cmn_cmd( slot_id, FVIO_I2C_CMN_CMD_R1, &para ) != 0 ){
         return -1;
@@ -329,7 +329,7 @@ static int32_t fvio_i2c_adxl345_rd_ctrl_reg( int32_t slot_id, ST_FVIO_I2C_ADXL34
 }
 
 /***************************************************************************
- * [名称]    :adxl345_wr_dma
+ * [名称]    :fvio_i2c_adxl345_wr_dma
  * [機能]    :adxl345 DMAライト
  * [引数]    :int32_t slot_id            スロットID
  *            ST_FVIO_ADXL345_DMA *attr  DMAのr/w用構造体
@@ -342,7 +342,7 @@ static int32_t fvio_i2c_adxl345_wr_dma( int32_t slot_id, ST_FVIO_I2C_ADXL345_DMA
     uint8_t send_data[8];
 
     //busyチェック
-    if( adxl345_inf.TblPlugBusy[slot_id] != FVIO_I2C_DMA_STOP ){
+    if( fvio_i2c_adxl345_inf.TblPlugBusy[slot_id] != FVIO_I2C_DMA_STOP ){
         return -1;
     }
 
@@ -356,13 +356,13 @@ static int32_t fvio_i2c_adxl345_wr_dma( int32_t slot_id, ST_FVIO_I2C_ADXL345_DMA
     para.data1     = attr->data1;
     para.data2     = attr->data2;
     para.dma_num   = attr->num;
-    para.cwait     = adxl345_inf.TblfvIOCnf[slot_id].cwait;
-    para.lwait     = adxl345_inf.TblfvIOCnf[slot_id].lwait;
+    para.cwait     = fvio_i2c_adxl345_inf.TblfvIOCnf[slot_id].cwait;
+    para.lwait     = fvio_i2c_adxl345_inf.TblfvIOCnf[slot_id].lwait;
 
     if( attr->trg & (FVIO_CMN_REG_TRG_REP | FVIO_CMN_REG_TRG_SYNC) ){
-        adxl345_inf.TblPlugBusy[slot_id] = FVIO_I2C_DMA_LOOP_PAE;
+    	fvio_i2c_adxl345_inf.TblPlugBusy[slot_id] = FVIO_I2C_DMA_LOOP_PAE;
     }else{
-        adxl345_inf.TblPlugBusy[slot_id] = FVIO_I2C_DMA_BUSY_PAE;
+    	fvio_i2c_adxl345_inf.TblPlugBusy[slot_id] = FVIO_I2C_DMA_BUSY_PAE;
     }
 
     if( fvio_i2c_cmn_cmd( slot_id, FVIO_I2C_CMN_CMD_R1, &para ) != 0 ){
@@ -373,7 +373,7 @@ static int32_t fvio_i2c_adxl345_wr_dma( int32_t slot_id, ST_FVIO_I2C_ADXL345_DMA
 }
 
 /***************************************************************************
- * [名称]    :adxl345_set_cnf
+ * [名称]    :fvio_i2c_adxl345_set_cnf
  * [機能]    :adxl345 cnfデータの設定
  * [引数]    :int32_t slot_id            スロットID
  *            ST_FVIO_ADXL345_CNF *attr  fvIO設定のr/w用構造体
@@ -382,13 +382,13 @@ static int32_t fvio_i2c_adxl345_wr_dma( int32_t slot_id, ST_FVIO_I2C_ADXL345_DMA
  ***************************************************************************/
 static int32_t fvio_i2c_adxl345_set_cnf( int32_t slot_id, ST_FVIO_I2C_ADXL345_CNF *attr )
 {
-    adxl345_inf.TblfvIOCnf[slot_id].cwait  = attr->cwait;
-    adxl345_inf.TblfvIOCnf[slot_id].lwait  = attr->lwait;
+	fvio_i2c_adxl345_inf.TblfvIOCnf[slot_id].cwait  = attr->cwait;
+	fvio_i2c_adxl345_inf.TblfvIOCnf[slot_id].lwait  = attr->lwait;
     return 0;
 }
 
 /***************************************************************************
- * [名称]    :adxl345_get_cnf
+ * [名称]    :fvio_i2c_adxl345_get_cnf
  * [機能]    :adxl345 cnfデータの取得
  * [引数]    :int32_t slot_id             スロットID
  *            ST_FVIO_ADXL345_CNF *attr   fvIO設定のr/w用構造体
@@ -397,13 +397,13 @@ static int32_t fvio_i2c_adxl345_set_cnf( int32_t slot_id, ST_FVIO_I2C_ADXL345_CN
  ***************************************************************************/
 static int32_t fvio_i2c_adxl345_get_cnf( int32_t slot_id, ST_FVIO_I2C_ADXL345_CNF *attr )
 {
-    attr->cwait = adxl345_inf.TblfvIOCnf[slot_id].cwait;
-    attr->lwait = adxl345_inf.TblfvIOCnf[slot_id].lwait;
+    attr->cwait = fvio_i2c_adxl345_inf.TblfvIOCnf[slot_id].cwait;
+    attr->lwait = fvio_i2c_adxl345_inf.TblfvIOCnf[slot_id].lwait;
     return 0;
 }
 
 /***************************************************************************
- * [名称]    :adxl345_set_int
+ * [名称]    :fvio_i2c_adxl345_set_int
  * [機能]    :adxl345 割り込み関数の設定
  * [引数]    :int32_t slot_id              スロットID
  *            ST_FVIO_ADXL345_INT　*attr   ユーザー定義割り込み処理のr/w用構造体
@@ -412,13 +412,13 @@ static int32_t fvio_i2c_adxl345_get_cnf( int32_t slot_id, ST_FVIO_I2C_ADXL345_CN
  ***************************************************************************/
 static int32_t fvio_i2c_adxl345_set_int( int32_t slot_id, ST_FVIO_I2C_ADXL345_INT *attr )
 {
-    adxl345_inf.TblfvIOInt[slot_id].paf_callback = attr->paf_callback;
-    adxl345_inf.TblfvIOInt[slot_id].pae_callback = attr->pae_callback;
+	fvio_i2c_adxl345_inf.TblfvIOInt[slot_id].paf_callback = attr->paf_callback;
+	fvio_i2c_adxl345_inf.TblfvIOInt[slot_id].pae_callback = attr->pae_callback;
     return 0;
 }
 
 /***************************************************************************
- * [名称]    :adxl345_get_bsy
+ * [名称]    :fvio_i2c_adxl345_get_bsy
  * [機能]    :adxl345 busyステータスの取得
  * [引数]    :int32_t slot_id              スロットID
  * [返値]    :int32_t                      FVIO_LOOP=連続実行中、FVIO_BUSY=単発実行中、FVIO_STOP=停止
@@ -426,11 +426,11 @@ static int32_t fvio_i2c_adxl345_set_int( int32_t slot_id, ST_FVIO_I2C_ADXL345_IN
  ***************************************************************************/
 static int32_t fvio_i2c_adxl345_get_bsy( int32_t slot_id )
 {
-    return adxl345_inf.TblPlugBusy[slot_id];
+    return fvio_i2c_adxl345_inf.TblPlugBusy[slot_id];
 }
 
 /***************************************************************************
- * [名称]    :adxl345_dma_restart
+ * [名称]    :fvio_i2c_adxl345_dma_restart
  * [機能]    :adxl345 dmaの再トリガ(pae)
  * [引数]    :int32_t slot_id              スロットID
  * [返値]    :
@@ -440,7 +440,7 @@ static int32_t fvio_i2c_adxl345_dma_restart( int32_t slot_id )
 {
     uint32_t ofst = 0x10 * slot_id;
 
-    if( ( adxl345_inf.TblPlugBusy[slot_id] & FVIO_I2C_DMA_LOOP_PAE ) == FVIO_I2C_DMA_LOOP_PAE ){
+    if( ( fvio_i2c_adxl345_inf.TblPlugBusy[slot_id] & FVIO_I2C_DMA_LOOP_PAE ) == FVIO_I2C_DMA_LOOP_PAE ){
         //次回のDMAを発行(PAE)
         (*(volatile uint32_t*)(&DMA0.DMAC0_CHCTRL_8.LONG + ofst)) = 0x8;    //SWRST=1
         (*(volatile uint32_t*)(&DMA0.DMAC0_CHCTRL_8.LONG + ofst)) = 1;      //SETEN=1
@@ -452,7 +452,7 @@ static int32_t fvio_i2c_adxl345_dma_restart( int32_t slot_id )
 }
 
 /***************************************************************************
- * [名称]    :adxl345_isr_pae_func
+ * [名称]    :fvio_i2c_adxl345_isr_pae_func
  * [機能]    :adxl345 FIFO_PAE割り込み
  * [引数]    :int32_t slot_id              スロットID
  * [返値]    :なし
@@ -463,18 +463,18 @@ static void fvio_i2c_adxl345_isr_pae_func( int32_t slot_id )
     uint32_t ofst = 0x10 * slot_id;
 
     //コールバック
-    if( adxl345_inf.TblfvIOInt[slot_id].pae_callback != NULL ){
-        adxl345_inf.TblfvIOInt[slot_id].pae_callback(slot_id);
+    if( fvio_i2c_adxl345_inf.TblfvIOInt[slot_id].pae_callback != NULL ){
+    	fvio_i2c_adxl345_inf.TblfvIOInt[slot_id].pae_callback(slot_id);
     }
 
     //busyフラグクリア( LOOPの場合はクリアしない )
-    if( adxl345_inf.TblPlugBusy[slot_id] & FVIO_I2C_DMA_BUSY_PAE ){
-        adxl345_inf.TblPlugBusy[slot_id] &= ~FVIO_I2C_DMA_BUSY_PAE;
+    if( fvio_i2c_adxl345_inf.TblPlugBusy[slot_id] & FVIO_I2C_DMA_BUSY_PAE ){
+    	fvio_i2c_adxl345_inf.TblPlugBusy[slot_id] &= ~FVIO_I2C_DMA_BUSY_PAE;
     }
 }
 
 /***************************************************************************
- * [名称]    :adxl345_isr_paf_func
+ * [名称]    :fvio_i2c_adxl345_isr_paf_func
  * [機能]    :adxl345 FIFO_PAF割り込み
  * [引数]    :int32_t slot_id              スロットID
  * [返値]    :なし
@@ -485,13 +485,13 @@ static void fvio_i2c_adxl345_isr_paf_func( int32_t slot_id )
     uint32_t ofst = 0x10 * slot_id;
 
     //コールバック
-    if( adxl345_inf.TblfvIOInt[slot_id].paf_callback != NULL ){
-        adxl345_inf.TblfvIOInt[slot_id].paf_callback(slot_id);
+    if( fvio_i2c_adxl345_inf.TblfvIOInt[slot_id].paf_callback != NULL ){
+    	fvio_i2c_adxl345_inf.TblfvIOInt[slot_id].paf_callback(slot_id);
     }
 
     //busyフラグクリア( LOOPの場合はクリアしない )
-    if( adxl345_inf.TblPlugBusy[slot_id] & FVIO_I2C_DMA_BUSY_PAF ){
-        adxl345_inf.TblPlugBusy[slot_id] &= ~FVIO_I2C_DMA_BUSY_PAF;
+    if( fvio_i2c_adxl345_inf.TblPlugBusy[slot_id] & FVIO_I2C_DMA_BUSY_PAF ){
+    	fvio_i2c_adxl345_inf.TblPlugBusy[slot_id] &= ~FVIO_I2C_DMA_BUSY_PAF;
     }
 }
 

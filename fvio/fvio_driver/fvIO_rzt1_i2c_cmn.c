@@ -69,7 +69,7 @@ const void *fvio_i2c_cmn_config_tbl[FVIO_SLOT_NUM] = {
 };
 
 /***************************************************************************
- * [名称]    :fvio_init_port_hiz
+ * [名称]    :fvio_i2c_cmn_init_port_hiz
  * [機能]    :fvIOポート初期化(ハイインピーダンス設定)
  * [引数]    :int32_t slot_id        スロットID
  * [返値]    :なし
@@ -114,7 +114,7 @@ void fvio_i2c_cmn_init_port_hiz( int32_t slot_id )
 }
 
 /***************************************************************************
- * [名称]    :fvio_init_port
+ * [名称]    :fvio_i2c_cmn_init_port
  * [機能]    :fvIOポート初期化
  * [引数]    :int32_t slot_id        スロットID
  * [返値]    :なし
@@ -330,7 +330,7 @@ int32_t fvio_i2c_cmn_getfifo( int32_t slot_id, uint8_t *rdata, uint8_t sz)
 }
 
 /***************************************************************************
- * [名称]    :fvio_init_int
+ * [名称]    :fvio_i2c_cmn_init_int
  * [機能]    :DMA設定( fvio fifo → cpu mem )
  * [引数]    :int32_t slot_id            スロットID
  *            uint8_t *rdata1            バッファ1
