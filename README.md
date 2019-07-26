@@ -44,7 +44,7 @@ fvio_rzt1_i2c_cmnの現在対応しているデバイスは以下になります
 ## 3.1 ビルド環境
 ビルドには以下のツールが必要です。
 - [KPIT GNUARM-NONE v16.01](https://gcc-renesas.com/ja/rz/rz-download-toolchains/)
-- [e2studio ver.7.1.0](https://www.renesas.com/jp/ja/products/software-tools/tools/ide/e2studio.html)
+- [e2studio ver.7.1.0](https://www.renesas.com/jp/ja/products/software-tools/tools/ide/e2studio.html)(ver.7.3.0でも可)
 
 ## 3.2 ベースプログラム
 
@@ -98,7 +98,9 @@ RZ_T_sflash_sample/(※1)<br>
 　　　　　 ┃               ┗ ★fvIO_if.h<br>
 　　　　　 ┃<br>
 　　　　　 ┗sample/<br>
-　　　　　  　 ┗ ★main.c(※3)<br>
+　　　　　  　 ┣★main.c(※3)<br>
+　　　　　  　 ┣★utility.c<br>
+　　　　　  　 ┗★utility.h
 
 ※1 RZ_T_ram_sampleでも同様の追加を行います。<br>
 ※2 リポジトリのdev_driver内の必要なディレクトリを追加します。<br>
@@ -148,7 +150,7 @@ SEMB1401を使用する場合、src/common/sflash_boot/spibsc_ioset_userdef.cに
 | fvio_write | fvIOに対してライト制御を実行。(プラグイン内部の設定に対しても可能)	|
 | fvio_read	 | fvIOに対してリード制御を実行。(プラグイン内部の設定に対しても可能)	|
 
-基本的な使用方法としては、以下の順にI/F関数をコールし、デバイスを制御します。詳細については、~~プラグインのアプリケーションノートを参照して下さい。~~(準備中です。)
+基本的な使用方法としては、以下の順にI/F関数をコールし、デバイスを制御します。詳細については、プラグインのアプリケーションノートを参照して下さい。
 
 1.fvio_sys_initでプラグインを初期化<br>
 2.fvio_entryでプラグインを登録<br>

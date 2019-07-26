@@ -31,27 +31,27 @@ void debug_port_init( void );
 
 uint8_t oled_startup_cmd[][6] = {
       //slave adr,          data,data,data,data,size
-        FVIO_SSD1306_SLVADR,0x00,0xAE,0x00,0x00,2,        //display off
-        FVIO_SSD1306_SLVADR,0x00,0xA8,0x3F,0x00,3,        //Set Multiplex Ratio
-        FVIO_SSD1306_SLVADR,0x00,0xD3,0x00,0x00,3,        //display offset
-        FVIO_SSD1306_SLVADR,0x00,0x40,0x00,0x00,2,        //set display start line
-        FVIO_SSD1306_SLVADR,0x00,0xA0,0x00,0x00,2,        //Set Segment Re-map
-        FVIO_SSD1306_SLVADR,0x00,0xC0,0x00,0x00,2,        //Set COM Output Scan Direction
-        FVIO_SSD1306_SLVADR,0x00,0xDA,0x11,0x00,3,        //Set COM Pins Hardware Configuration
-        FVIO_SSD1306_SLVADR,0x00,0x81,0x7F,0x00,3,        //Set Contrast Control
-        FVIO_SSD1306_SLVADR,0x00,0xA4,0x00,0x00,2,        //Entire Display ON
-        FVIO_SSD1306_SLVADR,0x00,0xA6,0x00,0x00,2,        //Set Normal/Inverse Display
-        FVIO_SSD1306_SLVADR,0x00,0xD5,0x80,0x00,3,        //Set Display Clock Divide Ratio/Oscillator Frequency
-        FVIO_SSD1306_SLVADR,0x00,0x20,0x01,0x00,3,        //Set Memory Addressing Mode
-        FVIO_SSD1306_SLVADR,0x00,0x21,0x00,0x7F,4,        //Set Column Address
-        FVIO_SSD1306_SLVADR,0x00,0x22,0x00,0x07,4,        //Set Page Address
-        FVIO_SSD1306_SLVADR,0x00,0x8D,0x14,0x00,3,        //Charge Pump Setting
-        FVIO_SSD1306_SLVADR,0x00,0xAF,0x00,0x00,2,        //display on
-        FVIO_SSD1306_SLVADR,0xff,0xff,0xff,0xff,0,        //end(size=0)
+        FVIO_I2C_SSD1306_SLVADR,0x00,0xAE,0x00,0x00,2,        //display off
+        FVIO_I2C_SSD1306_SLVADR,0x00,0xA8,0x3F,0x00,3,        //Set Multiplex Ratio
+        FVIO_I2C_SSD1306_SLVADR,0x00,0xD3,0x00,0x00,3,        //display offset
+        FVIO_I2C_SSD1306_SLVADR,0x00,0x40,0x00,0x00,2,        //set display start line
+        FVIO_I2C_SSD1306_SLVADR,0x00,0xA0,0x00,0x00,2,        //Set Segment Re-map
+        FVIO_I2C_SSD1306_SLVADR,0x00,0xC0,0x00,0x00,2,        //Set COM Output Scan Direction
+        FVIO_I2C_SSD1306_SLVADR,0x00,0xDA,0x11,0x00,3,        //Set COM Pins Hardware Configuration
+        FVIO_I2C_SSD1306_SLVADR,0x00,0x81,0x7F,0x00,3,        //Set Contrast Control
+        FVIO_I2C_SSD1306_SLVADR,0x00,0xA4,0x00,0x00,2,        //Entire Display ON
+        FVIO_I2C_SSD1306_SLVADR,0x00,0xA6,0x00,0x00,2,        //Set Normal/Inverse Display
+        FVIO_I2C_SSD1306_SLVADR,0x00,0xD5,0x80,0x00,3,        //Set Display Clock Divide Ratio/Oscillator Frequency
+        FVIO_I2C_SSD1306_SLVADR,0x00,0x20,0x01,0x00,3,        //Set Memory Addressing Mode
+        FVIO_I2C_SSD1306_SLVADR,0x00,0x21,0x00,0x7F,4,        //Set Column Address
+        FVIO_I2C_SSD1306_SLVADR,0x00,0x22,0x00,0x07,4,        //Set Page Address
+        FVIO_I2C_SSD1306_SLVADR,0x00,0x8D,0x14,0x00,3,        //Charge Pump Setting
+        FVIO_I2C_SSD1306_SLVADR,0x00,0xAF,0x00,0x00,2,        //display on
+        FVIO_I2C_SSD1306_SLVADR,0xff,0xff,0xff,0xff,0,        //end(size=0)
 };
 
-ST_FVIO_SSD1306_PACKET oled_data[2][128*2] __attribute__ ((section(".uncached_section")));    //OLED出力値
-uint8_t acc_data[2][128*6] __attribute__ ((section(".uncached_section")));                    //acc取得値
+ST_FVIO_I2C_SSD1306_PACKET oled_data[2][128*2] __attribute__ ((section(".uncached_section")));    //OLED出力値
+uint8_t acc_data[2][128*6] __attribute__ ((section(".uncached_section")));                        //acc取得値
 
 int32_t wend=0;
 int32_t rend=0;
@@ -88,7 +88,7 @@ void user_adxl_isr( int32_t slot_id )
 {
     //DMA再実行
     if( slot_id == SLOT_NO_ADXL ){
-        fvio_write( plug_id_adxl, FVIO_ADXL345_MODE_RDMA, NULL );
+        fvio_write( plug_id_adxl, FVIO_I2C_ADXL345_MODE_RDMA, NULL );
         r_p = (~r_p)&1;
         rend=1;
     }
@@ -125,18 +125,18 @@ int main (void)
     int32_t result[FVIO_SLOT_NUM]={0,0,0,0,0,0,0,0};
     int8_t r_wkp, w_wkp;
 
-    ST_FVIO_ADXL345_CNF     adxl_cnf;
-    ST_FVIO_ADXL345_CREG    adxl_creg;
-    ST_FVIO_ADXL345_DMA     adxl_dma;
-    ST_FVIO_ADXL345_INT     adxl_int;
+    ST_FVIO_I2C_ADXL345_CNF     adxl_cnf;
+    ST_FVIO_I2C_ADXL345_CREG    adxl_creg;
+    ST_FVIO_I2C_ADXL345_DMA     adxl_dma;
+    ST_FVIO_I2C_ADXL345_INT     adxl_int;
 
-    ST_FVIO_SSD1306_CNF     ssd_cnf;
-    ST_FVIO_SSD1306_CREG    ssd_creg;
-    ST_FVIO_SSD1306_DMA     ssd_dma;
-    ST_FVIO_SSD1306_INT     ssd_int;
+    ST_FVIO_I2C_SSD1306_CNF     ssd_cnf;
+    ST_FVIO_I2C_SSD1306_CREG    ssd_creg;
+    ST_FVIO_I2C_SSD1306_DMA     ssd_dma;
+    ST_FVIO_I2C_SSD1306_INT     ssd_int;
 
-    ST_FVIO_SSD1306_CNF     ssd;
-    ST_FVIO_ADXL345_CREG    adxl;
+    ST_FVIO_I2C_SSD1306_CNF     ssd;
+    ST_FVIO_I2C_ADXL345_CREG    adxl;
 
     //ダミーの待ち時間
     for (i = 0; i < 10000000 ; i++ )
@@ -178,11 +178,11 @@ int main (void)
     //fvIOプラグイン設定
     ssd_cnf.lwait=0;
     ssd_cnf.cwait=13;
-    fvio_write(plug_id_ssd, FVIO_SSD1306_MODE_CNF, &ssd_cnf);
+    fvio_write(plug_id_ssd, FVIO_I2C_SSD1306_MODE_CNF, &ssd_cnf);
 
     adxl_cnf.lwait=0;
     adxl_cnf.cwait=20;
-    fvio_write(plug_id_adxl, FVIO_ADXL345_MODE_CNF, &adxl_cnf);
+    fvio_write(plug_id_adxl, FVIO_I2C_ADXL345_MODE_CNF, &adxl_cnf);
 
     //SSD1306のスタートアップ設定
     for( i = 0 ; oled_startup_cmd[i][5] != 0 ; i++ ){
@@ -194,36 +194,36 @@ int main (void)
         sdata[4]   = oled_startup_cmd[i][4];
         ssd_creg.sdata  = sdata;
         ssd_creg.sz     = oled_startup_cmd[i][5];
-        fvio_write( plug_id_ssd, FVIO_SSD1306_MODE_CREG, &ssd_creg );
+        fvio_write( plug_id_ssd, FVIO_I2C_SSD1306_MODE_CREG, &ssd_creg );
     }
 
     //ADXL345のスタートアップ設定
     //データレート
     adxl_creg.trg   = 0;
-    sdata[0]        = FVIO_ADXL345_SLVADR;
+    sdata[0]        = FVIO_I2C_ADXL345_SLVADR;
     sdata[1]        = 0x2c;
     sdata[2]        = 0xf;
     adxl_creg.sdata = sdata;
     adxl_creg.sz    = 2;
-    fvio_write( plug_id_adxl, FVIO_ADXL345_MODE_CREG, &adxl_creg );
+    fvio_write( plug_id_adxl, FVIO_I2C_ADXL345_MODE_CREG, &adxl_creg );
 
     //wake up
     adxl_creg.trg   = 0;
-    sdata[0]        = FVIO_ADXL345_SLVADR;
+    sdata[0]        = FVIO_I2C_ADXL345_SLVADR;
     sdata[1]        = 0x2d;
     sdata[2]        = 0x8;        //8Hz
     adxl_creg.sdata = sdata;
     adxl_creg.sz    = 2;
-    fvio_write( plug_id_adxl, FVIO_ADXL345_MODE_CREG, &adxl_creg );
+    fvio_write( plug_id_adxl, FVIO_I2C_ADXL345_MODE_CREG, &adxl_creg );
 
     //割り込みハンドラ設定
     adxl_int.pae_callback = user_adxl_isr;
     adxl_int.paf_callback = NULL;
-    fvio_write( plug_id_adxl, FVIO_ADXL345_MODE_INT, &adxl_int );
+    fvio_write( plug_id_adxl, FVIO_I2C_ADXL345_MODE_INT, &adxl_int );
 
     ssd_int.pae_callback = NULL;
     ssd_int.paf_callback = user_ssd_isr;
-    fvio_write( plug_id_ssd, FVIO_SSD1306_MODE_INT, &ssd_int );
+    fvio_write( plug_id_ssd, FVIO_I2C_SSD1306_MODE_INT, &ssd_int );
 
     //DMA転送開始(SSD1306)
     ssd_dma.trg   = FVIO_CMN_REG_TRG_REP;
@@ -231,7 +231,7 @@ int main (void)
     ssd_dma.data2 = (uint8_t*)oled_data[1];
     ssd_dma.sz    = 5;
     ssd_dma.num   = 128*2;
-    fvio_write( plug_id_ssd, FVIO_SSD1306_MODE_DMA, &ssd_dma );
+    fvio_write( plug_id_ssd, FVIO_I2C_SSD1306_MODE_DMA, &ssd_dma );
 
     //DMA転送開始(AXDL345)
     adxl_dma.trg   = FVIO_CMN_REG_TRG_REP;
@@ -239,7 +239,7 @@ int main (void)
     adxl_dma.data2 = acc_data[1];
     adxl_dma.sz    = 5;
     adxl_dma.num   = 128;
-    fvio_write( plug_id_adxl, FVIO_ADXL345_MODE_DMA, &adxl_dma );
+    fvio_write( plug_id_adxl, FVIO_I2C_ADXL345_MODE_DMA, &adxl_dma );
 
     while(1){
         //受信完了
@@ -250,7 +250,7 @@ int main (void)
             w_wkp = (~w_p)&1;
 
             //DMA再実行
-            fvio_write( plug_id_ssd, FVIO_SSD1306_MODE_RDMA, NULL );
+            fvio_write( plug_id_ssd, FVIO_I2C_SSD1306_MODE_RDMA, NULL );
 
             for( i = 0 ; i < 128 ; i++ ){
                 //データ変換(1列分)
@@ -292,7 +292,7 @@ void init_val( void )
     //OLED出力データ
     for( i = 0 ; i < 2 ; i++ ){
         for( j = 0 ; j < 256 ; j++ ){
-            oled_data[i][j].slv_addr = FVIO_SSD1306_SLVADR;  //スレーブアドレス
+            oled_data[i][j].slv_addr = FVIO_I2C_SSD1306_SLVADR;  //スレーブアドレス
             oled_data[i][j].cntrl    = 0x40;                 //コントロール
             oled_data[i][j].data[0]  = 0;                    //データ0
             oled_data[i][j].data[1]  = 0;                    //データ1

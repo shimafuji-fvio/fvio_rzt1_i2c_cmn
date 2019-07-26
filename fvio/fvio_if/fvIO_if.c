@@ -216,7 +216,7 @@ int32_t fvio_assign( int32_t fvio_id, int32_t slot_id, int32_t *plug_id, void *a
 
             //アサイン済みかチェック
             for( i = 0 ; i < tmp_list->slot_sz ; i++ ){
-                if( fvio_inf.Plug2Slot[slot_id+i] == fvio_id ){
+                if( fvio_inf.Plug2Slot[slot_id+i] != 0 ){
                     return -1;                                           //assign済
                 }
             }
